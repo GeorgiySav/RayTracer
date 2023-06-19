@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(CMakeSFMLProject LANGUAGES CXX)
+project(RayTracer LANGUAGES CXX)
 
 include(FetchContent)
 FetchContent_Declare(SFML
@@ -7,12 +7,26 @@ FetchContent_Declare(SFML
     GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(CMakeSFMLProject src/main.cpp)
-target_link_libraries(CMakeSFMLProject PRIVATE sfml-graphics)
-target_compile_features(CMakeSFMLProject PRIVATE cxx_std_17)
+find_package(glbinding REQUIRED)
+
+file(GLOB SRCFILES CONFIGURE_DEPENDS "src/*.h" "src/*.cpp" "src/rendering/*.h" "src/rendering/*.cpp")
+
+add_executable(${CMAKE_PROJECT_NAME} ${SRCFILES})
+
+target_link_libraries(
+    ${CMAKE_PROJECT_NAME} 
+    PUBLIC 
+    glbinding::glbinding
+    glbinding::glbinding-aux 
+    PRIVATE 
+    sfml-graphics
+    sfml-window)
+
+target_compile_features(${CMAKE_PROJECT_NAME} PRIVATE cxx_std_17)
+
 if (WIN32 AND BUILD_SHARED_LIBS)
-    add_custom_command(TARGET CMakeSFMLProject POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:CMakeSFMLProject> $<TARGET_FILE_DIR:CMakeSFMLProject> COMMAND_EXPAND_LISTS)
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${CMAKE_PROJECT_NAME}> $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}> COMMAND_EXPAND_LISTS)
 endif()
 
-install(TARGETS CMakeSFMLProject)
+install(TARGETS ${CMAKE_PROJECT_NAME})
