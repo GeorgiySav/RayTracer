@@ -8,6 +8,7 @@
 #include <glbinding/getProcAddress.h>
 
 #include "rendering/shader.h"
+#include "rendering/texture.h"
 
 gl::GLfloat vertices[] =
 {
@@ -57,14 +58,17 @@ int main()
 	gl::glVertexArrayVertexBuffer(VAO, 0, VBO, 0, 5 * sizeof(gl::GLfloat));
 	gl::glVertexArrayElementBuffer(VAO, EBO);
 
-	gl::GLuint screenTex;
-	gl::glCreateTextures(gl::GL_TEXTURE_2D, 1, &screenTex);
-	gl::glTextureParameteri(screenTex, gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
-	gl::glTextureParameteri(screenTex, gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
-	gl::glTextureParameteri(screenTex, gl::GL_TEXTURE_WRAP_S, gl::GL_CLAMP_TO_EDGE);
-	gl::glTextureParameteri(screenTex, gl::GL_TEXTURE_WRAP_T, gl::GL_CLAMP_TO_EDGE);
-	gl::glTextureStorage2D(screenTex, 1, gl::GL_RGBA32F, SCREEN_WIDTH, SCREEN_HEIGHT);
-	gl::glBindImageTexture(0, screenTex, 0, gl::GL_FALSE, 0, gl::GL_WRITE_ONLY, gl::GL_RGBA32F);
+	//::GLuint screenTex;
+	//l::glCreateTextures(gl::GL_TEXTURE_2D, 1, &screenTex);
+	//l::glTextureParameteri(screenTex, gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
+	//l::glTextureParameteri(screenTex, gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
+	//l::glTextureParameteri(screenTex, gl::GL_TEXTURE_WRAP_S, gl::GL_CLAMP_TO_EDGE);
+	//l::glTextureParameteri(screenTex, gl::GL_TEXTURE_WRAP_T, gl::GL_CLAMP_TO_EDGE);
+	//l::glTextureStorage2D(screenTex, 1, gl::GL_RGBA32F, SCREEN_WIDTH, SCREEN_HEIGHT);
+	//l::glBindImageTexture(0, screenTex, 0, gl::GL_FALSE, 0, gl::GL_WRITE_ONLY, gl::GL_RGBA32F);
+
+	rendering::Texture2D screenTex;
+	screenTex.create(SCREEN_WIDTH, SCREEN_HEIGHT, gl::GL_RGBA32F, gl::GL_NEAREST, gl::GL_NEAREST, gl::GL_CLAMP_TO_EDGE, gl::GL_CLAMP_TO_EDGE, gl::GL_WRITE_ONLY);
 
 	rendering::VertFragProgram screenShaderProgram = rendering::VertFragProgram("../../../src/shaders/screen_vert.vert", "../../../src/shaders/screen_frag.frag");
 
@@ -110,11 +114,11 @@ int main()
 
 		screenShaderProgram.use();
 		//gl::glBindTextureUnit(0, screenTex);
-		screenShaderProgram.setTexture("screen", screenTex);
+		screenShaderProgram.setTexture("screen", screenTex.getId());
 		gl::glBindVertexArray(VAO);
 		gl::glDrawElements(gl::GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), gl::GL_UNSIGNED_INT, 0);
 
         window.display();
     }
-
+	
 }
