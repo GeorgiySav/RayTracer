@@ -21,7 +21,8 @@ int main()
 
 	gl::glViewport(0, 0, window.getSize().x, window.getSize().y);
 
-	engine::initialiseRenderer(window.getSize().x, window.getSize().y);
+	engine::Renderer renderer;
+	renderer.create(window.getSize().x, window.getSize().y);
 
 	int work_grp_cnt[3];
 	gl::glGetIntegeri_v(gl::GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &work_grp_cnt[0]);
@@ -54,14 +55,14 @@ int main()
                 window.close();
             }
 			else if (event.type == sf::Event::Resized) {
-				engine::resizeResolution(window.getSize().x, window.getSize().y);
+				renderer.create(window.getSize().x, window.getSize().y);
 				gl::glViewport(0, 0, window.getSize().x, window.getSize().y);
 			}
         }
  
-		engine::render();
+		renderer.render();
 
         window.display();
     }
-	
+
 }
