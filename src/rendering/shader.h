@@ -5,7 +5,7 @@
 
 #include <glbinding/gl/gl.h>
 
-namespace rendering
+namespace engine
 {
 
 	// base class for all other shader programs. Do not use this class
@@ -71,16 +71,19 @@ namespace rendering
 	class VertFragProgram : public ShaderProgram
 	{
 	public:
-		VertFragProgram(const char* vertexFP, const char* fragmentFP);
+		VertFragProgram() {}
 		~VertFragProgram() {}
 
+		void loadfromFile(const char* vertexFP, const char* fragmentFP);
 	};
 
 	class ComputeProgram : public ShaderProgram
 	{
 	public:
-		ComputeProgram(const char* filepath);
+		ComputeProgram() {}
 		~ComputeProgram() {}
+
+		void loadFromFile(const char* filepath);
 
 		void dispatch(gl::GLuint x, gl::GLuint y, gl::GLuint z, gl::MemoryBarrierMask m);
 	};

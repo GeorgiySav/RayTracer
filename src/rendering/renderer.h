@@ -1,18 +1,10 @@
 #pragma once
 
-namespace renderer {
+#include <glbinding/gl/gl.h>
 
-	class Renderer
-	{
-	public:
-		Renderer();
-		~Renderer();
-
-		void setResolution(int new_width, int new_height);
-
-		void render();
-
-	private:
-	};
-
+namespace engine {
+	extern bool initialiseRenderer(gl::GLsizei width, gl::GLsizei height);
+	extern void destroyRenderer();
+	extern void render();
+	extern void resizeResolution(gl::GLsizei new_width, gl::GLsizei new_height);
 }

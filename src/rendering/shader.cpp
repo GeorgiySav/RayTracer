@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-namespace rendering
+namespace engine
 {
 	std::string readFromFile(const char* filepath)
 	{
@@ -54,7 +54,7 @@ namespace rendering
 	}
 
 
-	VertFragProgram::VertFragProgram(const char* vertexFP, const char* fragmentVP)
+	void VertFragProgram::loadfromFile(const char* vertexFP, const char* fragmentVP)
 	{
 		std::string vS = readFromFile(vertexFP);
 		std::string fS = readFromFile(fragmentVP);
@@ -81,7 +81,7 @@ namespace rendering
 		listAttributesUniforms();
 	}
 
-	ComputeProgram::ComputeProgram(const char* filepath)
+	void ComputeProgram::loadFromFile(const char* filepath)
 	{
 		std::string cS = readFromFile(filepath);
 
