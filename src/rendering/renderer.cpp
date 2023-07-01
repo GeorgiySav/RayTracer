@@ -2,9 +2,13 @@
 
 #include "shader.h"
 
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
 namespace engine {
 
 	Renderer::Renderer() {
+		
 		// create vertex arrays and buffers
 		gl::glCreateVertexArrays(1, &m_screen_vao);
 		gl::glCreateBuffers(1, &m_screen_vbo);
@@ -66,8 +70,17 @@ namespace engine {
 	}
 
 	void Renderer::prepareFrame() {
+		glm::vec3 cam_pos = { 0.0, 0.0, 0.0 };
+		glm::vec2 plane_dims = {};
+		plane_dims.x = 2.0 * 0.1 * glm::tan(glm::radians(90.0) * 0.5);
+		plane_dims.y = plane_dims.x * ((float)m_screen_height / (float)m_screen_width);
 		// perform the ray tracing a clear the screen
 		m_ray_tracing_program.use();
+		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_matrix"), 1, gl::GL_FALSE, glm::value_ptr(camera.getCameraMatrix()));
+		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_pos"), 1, glm::value_ptr(camera.getPosition()));
+		gl::glUniform2fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "plane_dims"), 1, glm::value_ptr(camera.getPlaneDims((float)m_screen_height / (float)m_screen_width)));
+		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "near_plane"), camera.getNear());
+		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "far_plane"), camera.getFar());
 		m_ray_tracing_program.dispatch(std::ceil(m_screen_width * 0.125), std::ceil(m_screen_height * 0.125), 1, gl::GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT);

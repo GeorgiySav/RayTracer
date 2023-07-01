@@ -7,6 +7,9 @@ FetchContent_Declare(SFML
     GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
+include_directories(include/)
+add_subdirectory(include/glm)
+
 find_package(glbinding REQUIRED)
 
 file(GLOB SRCFILES CONFIGURE_DEPENDS "src/*.h" "src/*.cpp" "src/rendering/*.h" "src/rendering/*.cpp")
@@ -16,6 +19,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${SRCFILES})
 target_link_libraries(
     ${CMAKE_PROJECT_NAME} 
     PUBLIC 
+    glm
     glbinding::glbinding
     glbinding::glbinding-aux 
     PRIVATE 

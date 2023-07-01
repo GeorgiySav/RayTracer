@@ -3,6 +3,7 @@
 #include <glbinding/gl/gl.h>
 
 #include "shader.h"
+#include "camera.h"
 
 namespace engine {
 
@@ -33,6 +34,8 @@ namespace engine {
 			0, 2, 1,
 			0, 3, 2
 		};
+
+		Camera camera;
 
 		void prepareFrame();
 		void renderFrame();
