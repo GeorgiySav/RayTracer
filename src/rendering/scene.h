@@ -21,6 +21,8 @@ namespace engine {
 		void setHwAspect(float ratio) { m_camera.setHwAspect(ratio); }
 		const Camera& getCamera() const { return m_camera; }
 
+		const gl::GLsizei getCircleBufferSize() { return m_circle_ssbo.size; }
+
 	private:
 		Camera m_camera;
 
@@ -28,7 +30,21 @@ namespace engine {
 			gl::GLuint id;
 			gl::GLsizei size;
 			gl::GLsizei max_size;
+			gl::GLsizeiptr item_size;
 			~SSBO() { gl::glDeleteBuffers(1, &id); }
+			template <typename T>
+			void add(T& data) {
+				if (size >= max_size)
+					return;
+				gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, id);
+				//void* raw_data = gl::glMapBufferRange(gl::GL_SHADER_STORAGE_BUFFER, size, (size + 1) * item_size, gl::GL_MAP_WRITE_BIT | gl::GL_MAP_INVALIDATE_BUFFER_BIT);
+				//T* ssbo_data = static_cast<T*>(raw_data);
+				//ssbo_data[size] = data;
+				//gl::glUnmapBuffer(gl::GL_SHADER_STORAGE_BUFFER);
+				gl::glBufferSubData(gl::GL_SHADER_STORAGE_BUFFER, size, item_size, &data);
+				gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, 0);
+				size++;
+			}
 		};
 		SSBO m_circle_ssbo;
 	};

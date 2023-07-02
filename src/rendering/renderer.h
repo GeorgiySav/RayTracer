@@ -36,7 +36,7 @@ namespace engine {
 			0, 3, 2
 		};
 
-		void prepareFrame(const Camera& camera);
+		void prepareFrame(const std::unique_ptr<Scene>& scene);
 		void renderFrame();
 	};
 }

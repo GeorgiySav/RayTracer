@@ -11,11 +11,11 @@ Application::Application() {
 	glbinding::initialize(glbinding::getProcAddress, false);
 	gl::glViewport(0, 0, m_window.getSize().x, m_window.getSize().y);
 
-	m_renderer = std::make_unique<engine::Renderer>();
-	m_renderer->create(m_window.getSize().x, m_window.getSize().y);
-
 	m_scene = std::make_unique<engine::Scene>();
 	m_scene->setHwAspect((float)m_window.getSize().y / (float)m_window.getSize().x);
+
+	m_renderer = std::make_unique<engine::Renderer>();
+	m_renderer->create(m_window.getSize().x, m_window.getSize().y);
 
 	int work_grp_cnt[3];
 	gl::glGetIntegeri_v(gl::GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &work_grp_cnt[0]);

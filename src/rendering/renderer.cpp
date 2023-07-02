@@ -66,19 +66,22 @@ namespace engine {
 	}
 
 	void Renderer::render(const std::unique_ptr<Scene>& scene) {
-		const Camera& scene_camera = scene->getCamera();
-		this->prepareFrame(scene_camera);
+		this->prepareFrame(scene);
 		this->renderFrame();
 	}
 
-	void Renderer::prepareFrame(const Camera& camera) {
+	void Renderer::prepareFrame(const std::unique_ptr<Scene>& scene) {
+		const Camera& scene_camera = scene->getCamera();
 		// perform the ray tracing a clear the screen
 		m_ray_tracing_program.use();
-		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_matrix"), 1, gl::GL_FALSE, camera.getCameraMatrixPointer());
-		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_pos"), 1, camera.getPositionPointer());
-		gl::glUniform2fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "plane_dims"), 1, camera.getPlaneDimsPointer());
-		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "near_plane"), camera.getNear());
-		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "far_plane"), camera.getFar());
+
+		gl::glUniform1i(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "spheres_max"), scene->getCircleBufferSize());
+
+		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_matrix"), 1, gl::GL_FALSE, scene_camera.getCameraMatrixPointer());
+		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_pos"), 1, scene_camera.getPositionPointer());
+		gl::glUniform2fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "plane_dims"), 1, scene_camera.getPlaneDimsPointer());
+		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "near_plane"), scene_camera.getNear());
+		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "far_plane"), scene_camera.getFar());
 		m_ray_tracing_program.dispatch(std::ceil(m_screen_width * 0.125), std::ceil(m_screen_height * 0.125), 1, gl::GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
