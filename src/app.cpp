@@ -14,6 +14,9 @@ Application::Application() {
 	m_renderer = std::make_unique<engine::Renderer>();
 	m_renderer->create(m_window.getSize().x, m_window.getSize().y);
 
+	m_scene = std::make_unique<engine::Scene>();
+	m_scene->setHwAspect((float)m_window.getSize().y / (float)m_window.getSize().x);
+
 	int work_grp_cnt[3];
 	gl::glGetIntegeri_v(gl::GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &work_grp_cnt[0]);
 	gl::glGetIntegeri_v(gl::GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &work_grp_cnt[1]);
@@ -53,10 +56,11 @@ void Application::run() {
 }
 
 void Application::update() {
+	m_scene->update();
 }
 
 void Application::render() {
-	m_renderer->render();
+	m_renderer->render(m_scene);
 	m_window.display();
 }
 
@@ -66,6 +70,7 @@ void Application::processEvent(sf::Event& e) {
 	}
 	else if (e.type == sf::Event::Resized) {
 		m_renderer->resize(m_window.getSize().x, m_window.getSize().y);
+		m_scene->setHwAspect((float)m_window.getSize().y / (float)m_window.getSize().x);
 		gl::glViewport(0, 0, m_window.getSize().x, m_window.getSize().y);
 	}
 }

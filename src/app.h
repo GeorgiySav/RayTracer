@@ -16,6 +16,7 @@ private:
 	sf::Window m_window;
 
 	std::unique_ptr<engine::Renderer> m_renderer;
+	std::unique_ptr<engine::Scene> m_scene;
 
 	void update();
 	void render();

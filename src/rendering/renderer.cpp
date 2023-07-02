@@ -59,26 +59,24 @@ namespace engine {
 
 	void Renderer::resize(gl::GLsizei new_width, gl::GLsizei new_height) {
 		m_screen_width = new_width, m_screen_height = new_height;
+		//camera.setHwAspect((float)m_screen_height / (float)m_screen_width);
 		gl::glBindTexture(gl::GL_TEXTURE_2D, m_screen_texture);
 		gl::glTexImage2D(gl::GL_TEXTURE_2D, 0, gl::GL_RGBA32F, new_width, new_height, 0, gl::GL_RGBA, gl::GL_FLOAT, NULL);
 		gl::glBindTexture(gl::GL_TEXTURE_2D, 0);
 	}
 
-	void Renderer::render() {
-		this->prepareFrame();
+	void Renderer::render(const std::unique_ptr<Scene>& scene) {
+		const Camera& scene_camera = scene->getCamera();
+		this->prepareFrame(scene_camera);
 		this->renderFrame();
 	}
 
-	void Renderer::prepareFrame() {
-		glm::vec3 cam_pos = { 0.0, 0.0, 0.0 };
-		glm::vec2 plane_dims = {};
-		plane_dims.x = 2.0 * 0.1 * glm::tan(glm::radians(90.0) * 0.5);
-		plane_dims.y = plane_dims.x * ((float)m_screen_height / (float)m_screen_width);
+	void Renderer::prepareFrame(const Camera& camera) {
 		// perform the ray tracing a clear the screen
 		m_ray_tracing_program.use();
-		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_matrix"), 1, gl::GL_FALSE, glm::value_ptr(camera.getCameraMatrix()));
-		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_pos"), 1, glm::value_ptr(camera.getPosition()));
-		gl::glUniform2fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "plane_dims"), 1, glm::value_ptr(camera.getPlaneDims((float)m_screen_height / (float)m_screen_width)));
+		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_matrix"), 1, gl::GL_FALSE, camera.getCameraMatrixPointer());
+		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_pos"), 1, camera.getPositionPointer());
+		gl::glUniform2fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "plane_dims"), 1, camera.getPlaneDimsPointer());
 		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "near_plane"), camera.getNear());
 		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "far_plane"), camera.getFar());
 		m_ray_tracing_program.dispatch(std::ceil(m_screen_width * 0.125), std::ceil(m_screen_height * 0.125), 1, gl::GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);

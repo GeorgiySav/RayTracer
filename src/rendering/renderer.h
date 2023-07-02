@@ -4,6 +4,7 @@
 
 #include "shader.h"
 #include "camera.h"
+#include "scene.h"
 
 namespace engine {
 
@@ -15,7 +16,7 @@ namespace engine {
 		void create(gl::GLsizei width, gl::GLsizei height);
 		void resize(gl::GLsizei new_width, gl::GLsizei new_height);
 
-		void render();
+		void render(const std::unique_ptr<Scene>& scene);
 
 	private:
 		gl::GLuint m_screen_vao, m_screen_vbo, m_screen_ebo;
@@ -35,9 +36,7 @@ namespace engine {
 			0, 3, 2
 		};
 
-		Camera camera;
-
-		void prepareFrame();
+		void prepareFrame(const Camera& camera);
 		void renderFrame();
 	};
 }

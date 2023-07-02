@@ -3,6 +3,7 @@
 #include <glbinding/gl/gl.h>
 
 #include "objects.h"
+#include "camera.h"
 
 namespace engine {
 	/// <summary>
@@ -13,9 +14,16 @@ namespace engine {
 		Scene();
 		~Scene();
 
+		void update();
+
 		void addCircle();
 
+		void setHwAspect(float ratio) { m_camera.setHwAspect(ratio); }
+		const Camera& getCamera() const { return m_camera; }
+
 	private:
+		Camera m_camera;
+
 		struct SSBO {
 			gl::GLuint id;
 			gl::GLsizei size;

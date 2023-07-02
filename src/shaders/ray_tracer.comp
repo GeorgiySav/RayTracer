@@ -81,22 +81,22 @@ HitRecord intersectSphere(int sIndex, Ray r) {
 	float discriminant = (half_b * half_b) - (a * c);
 
 	HitRecord hit;
-	if (discriminant >= 0) {
-		float sqrtd = sqrt(discriminant);
-		float root = (-half_b - sqrtd) / a;
-		if (root < near_plane || root > far_plane) {
-			root = (-half_b + sqrtd) / a;
-			if (root < near_plane || root > far_plane) {
-				hit.hit = false;
-				return hit;
-			}
-		}
-		hit.hit = true;
-		hit.dist = root;
-		hit.point = r.origin + (root * r.dir);
-		hit.normal = (hit.point - s.pos) / s.rad;
+	if (discriminant < 0) {
+		hit.hit = false;
 		return hit;
 	}
-	hit.hit = false;
+	float sqrtd = sqrt(discriminant);
+	float root = (-half_b - sqrtd) / a;
+	if (root < near_plane || root > far_plane) {
+		root = (-half_b + sqrtd) / a;
+		if (root < near_plane || root > far_plane) {
+			hit.hit = false;
+			return hit;
+		}
+	}
+	hit.hit = true;
+	hit.dist = root;
+	hit.point = r.origin + (root * r.dir);
+	hit.normal = (hit.point - s.pos) / s.rad;
 	return hit;
 }
