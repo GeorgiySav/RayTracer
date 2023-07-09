@@ -71,6 +71,8 @@ namespace engine {
 	}
 
 	void Renderer::prepareFrame(const std::unique_ptr<Scene>& scene) {
+		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
+
 		const Camera& scene_camera = scene->getCamera();
 		// perform the ray tracing a clear the screen
 		m_ray_tracing_program.use();
@@ -80,11 +82,11 @@ namespace engine {
 		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_matrix"), 1, gl::GL_FALSE, scene_camera.getCameraMatrixPointer());
 		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_pos"), 1, scene_camera.getPositionPointer());
 		gl::glUniform2fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "plane_dims"), 1, scene_camera.getPlaneDimsPointer());
+		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "lower_left_corner"), 1, scene_camera.getLowerLeftPointer());
 		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "near_plane"), scene_camera.getNear());
 		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "far_plane"), scene_camera.getFar());
 		m_ray_tracing_program.dispatch(std::ceil(m_screen_width * 0.125), std::ceil(m_screen_height * 0.125), 1, gl::GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
-		gl::glClear(gl::GL_COLOR_BUFFER_BIT);
 	}
 
 	void Renderer::renderFrame() {
@@ -93,6 +95,9 @@ namespace engine {
 		m_render_screen_program.setTexture("screen", m_screen_texture);
 		gl::glBindVertexArray(m_screen_vao);
 		gl::glDrawElements(gl::GL_TRIANGLES, sizeof(m_screen_indices) / sizeof(m_screen_indices[0]), gl::GL_UNSIGNED_INT, 0);
+		gl::glBindVertexArray(0); // unbind vao
+		gl::glUseProgram(0); // unbind program
+		// must unbind to allow for sfml to do stuff
 	}
 
 }

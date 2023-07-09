@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SFML/Window.hpp>
 #include <glbinding/gl/gl.h>
 
 #include "objects.h"
@@ -14,11 +15,16 @@ namespace engine {
 		Scene();
 		~Scene();
 
+		void processKeyHolds();
+		void processKeyPress(sf::Event& e);
+		void processMouseMovement(int middle_x, int middle_y);
+
 		void update();
 
 		void addCircle();
 
 		void setHwAspect(float ratio) { m_camera.setHwAspect(ratio); }
+		void moveCamera(const glm::vec3& offset) { m_camera.move(offset); }
 		const Camera& getCamera() const { return m_camera; }
 
 		const gl::GLsizei getCircleBufferSize() { return m_circle_ssbo.size; }
@@ -41,7 +47,7 @@ namespace engine {
 				//T* ssbo_data = static_cast<T*>(raw_data);
 				//ssbo_data[size] = data;
 				//gl::glUnmapBuffer(gl::GL_SHADER_STORAGE_BUFFER);
-				gl::glBufferSubData(gl::GL_SHADER_STORAGE_BUFFER, size, item_size, &data);
+				gl::glBufferSubData(gl::GL_SHADER_STORAGE_BUFFER, size * item_size, item_size, &data);
 				gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, 0);
 				size++;
 			}

@@ -3,6 +3,13 @@
 // inputs
 layout(rgba32f, binding = 0) uniform image2D screen;
 
+uniform mat4 cam_matrix;
+uniform vec3 cam_pos;
+uniform vec2 plane_dims;
+uniform vec3 lower_left_corner;
+uniform float near_plane;
+uniform float far_plane;
+
 struct Sphere {
 	vec3 pos;
 	float rad;
@@ -25,13 +32,14 @@ struct HitRecord {
 	float dist;
 };
 
+Ray createRay(vec3 origin, vec3 dir) { 
+	Ray new_ray;
+	new_ray.origin = origin;
+	new_ray.dir = dir;
+	return new_ray;
+}
 HitRecord intersectSphere(int sIndex, Ray r);
 
-uniform mat4 cam_matrix;
-uniform vec3 cam_pos;
-uniform vec2 plane_dims;
-uniform float near_plane;
-uniform float far_plane;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 void main() {
@@ -47,18 +55,30 @@ void main() {
 	vec2 uv = vec2(0, 0);
     uv.x = float((-float(p.x * 2.0) / output_dims.x) + 1.0); // transform to [-1.0, 1.0]
     uv.y = float((-float(p.y * 2.0) / output_dims.y) + 1.0); // transform to [-1.0, 1.0]
+	//uv.x = float(p.x) / float(output_dims.x);
+	//uv.y = float(p.y) / float(output_dims.y);
 
-	vec3 screen_intersection_local = vec3(uv, 1) * vec3(plane_dims, near_plane);
+
+	vec3 screen_intersection_local = vec3(uv, -1) * vec3(plane_dims, near_plane);
     vec3 screen_intersection = vec3(cam_matrix * vec4(screen_intersection_local, 1.0));
 	
-	Ray ray;
-	ray.origin = cam_pos;
-	ray.dir = normalize(screen_intersection - ray.origin);
+	//Ray ray = createRay(cam_pos, normalize(lower_left_corner + vec3(uv.x*plane_dims.x, uv.y*plane_dims.y, 0) - cam_pos));
+	Ray ray = createRay(cam_pos, normalize(screen_intersection));
+	//ray.origin = cam_pos;
+	//ray.dir = normalize(screen_intersection - ray.origin);
 
-	HitRecord hitInfo = intersectSphere(0, ray);	
-
-	if (hitInfo.hit == true) {
-		pixel = vec4(hitInfo.normal, 1.0);
+	HitRecord hitInfoZ = intersectSphere(0, ray);	
+	HitRecord hitInfoX = intersectSphere(1, ray);	
+	HitRecord hitInfoY = intersectSphere(2, ray);	
+	
+	if (hitInfoZ.hit == true) {
+		pixel = vec4(0.0, 0.0, 1.0, 1.0);
+	}
+	else if (hitInfoY.hit == true) {
+		pixel = vec4(0.0, 1.0, 0.0, 1.0);
+	}
+	else if (hitInfoX.hit == true) {
+		pixel = vec4(1.0, 0.0, 0.0, 1.0);
 	}
 	else {
 		pixel = vec4(ray.dir, 1.0);

@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "consts.h"
+
 namespace engine {
 
 	class Camera
@@ -11,6 +13,8 @@ namespace engine {
 		Camera();
 		~Camera();
 
+		void move(const glm::vec3& offset);
+		void move(Direction dir, float offset);
 		void rotate(double xOffset, double yOffset);
 
 		void update();
@@ -20,13 +24,17 @@ namespace engine {
 		const float* getPlaneDimsPointer() const { return glm::value_ptr(m_plane_dimensions); }
 		const float* getCameraMatrixPointer() const { return glm::value_ptr(m_cam_matrix); }
 		const float* getPositionPointer() const { return glm::value_ptr(m_position); }
+		const float* getLowerLeftPointer() const { return glm::value_ptr(m_lower_left_corner); }
 		float getNear() const { return m_near; }
 		float getFar() const { return m_far; }
-
+		const glm::vec3& getPosition() const { return m_position; }
+		const glm::vec3& getRotation() const { return m_rotation; }
 
 	private:
 		void updatePlane();
 		void updateMat();
+
+		static const glm::vec3 m_world_up;
 
 		glm::vec3 m_position;
 
@@ -48,7 +56,7 @@ namespace engine {
 		glm::mat4 m_cam_matrix;
 		bool m_update_mat;
 		glm::vec2 m_plane_dimensions;
+		glm::vec3 m_lower_left_corner;
 		bool m_update_plane;
 	};
-
 }

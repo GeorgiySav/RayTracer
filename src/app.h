@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
 #include "rendering/renderer.h"
@@ -13,10 +14,13 @@ public:
 
 	void run();
 private:
-	sf::Window m_window;
+	sf::RenderWindow m_window;
 
 	std::unique_ptr<engine::Renderer> m_renderer;
 	std::unique_ptr<engine::Scene> m_scene;
+
+	sf::Font m_debug_font;
+	sf::Text m_debug_text;
 
 	void update();
 	void render();
