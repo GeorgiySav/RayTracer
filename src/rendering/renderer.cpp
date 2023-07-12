@@ -77,14 +77,17 @@ namespace engine {
 		// perform the ray tracing a clear the screen
 		m_ray_tracing_program.use();
 
-		gl::glUniform1i(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "spheres_max"), scene->getCircleBufferSize());
-
 		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_matrix"), 1, gl::GL_FALSE, scene_camera.getCameraMatrixPointer());
 		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_pos"), 1, scene_camera.getPositionPointer());
 		gl::glUniform2fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "plane_dims"), 1, scene_camera.getPlaneDimsPointer());
-		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "lower_left_corner"), 1, scene_camera.getLowerLeftPointer());
 		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "near_plane"), scene_camera.getNear());
 		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "far_plane"), scene_camera.getFar());
+
+		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "inverse_view"), 1, gl::GL_FALSE, scene_camera.getInverseViewPointer());
+		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "inverse_projection"), 1, gl::GL_FALSE, scene_camera.getInverseProjectionPointer());
+
+		gl::glUniform1i(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "spheres_max"), scene->getCircleBufferSize());
+
 		m_ray_tracing_program.dispatch(std::ceil(m_screen_width * 0.125), std::ceil(m_screen_height * 0.125), 1, gl::GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 	}

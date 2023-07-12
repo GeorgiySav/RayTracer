@@ -36,7 +36,6 @@ namespace engine {
 			gl::GLuint id;
 			gl::GLsizei size;
 			gl::GLsizei max_size;
-			gl::GLsizeiptr item_size;
 			~SSBO() { gl::glDeleteBuffers(1, &id); }
 			template <typename T>
 			void add(T& data) {
@@ -47,7 +46,7 @@ namespace engine {
 				//T* ssbo_data = static_cast<T*>(raw_data);
 				//ssbo_data[size] = data;
 				//gl::glUnmapBuffer(gl::GL_SHADER_STORAGE_BUFFER);
-				gl::glBufferSubData(gl::GL_SHADER_STORAGE_BUFFER, size * item_size, item_size, &data);
+				gl::glBufferSubData(gl::GL_SHADER_STORAGE_BUFFER, size * sizeof(T), sizeof(T), &data);
 				gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, 0);
 				size++;
 			}
