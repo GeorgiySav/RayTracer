@@ -77,7 +77,6 @@ namespace engine {
 		// perform the ray tracing a clear the screen
 		m_ray_tracing_program.use();
 
-		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_matrix"), 1, gl::GL_FALSE, scene_camera.getCameraMatrixPointer());
 		gl::glUniform3fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "cam_pos"), 1, scene_camera.getPositionPointer());
 		gl::glUniform2fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "plane_dims"), 1, scene_camera.getPlaneDimsPointer());
 		gl::glUniform1f(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "near_plane"), scene_camera.getNear());

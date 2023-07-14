@@ -22,7 +22,6 @@ namespace engine {
 		void setHwAspect(float hwAspect) { m_hwAspect = hwAspect; m_update_plane = true; }
 
 		const float* getPlaneDimsPointer() const { return glm::value_ptr(m_plane_dimensions); }
-		const float* getCameraMatrixPointer() const { return glm::value_ptr(m_cam_matrix); }
 		const float* getInverseProjectionPointer() const { return glm::value_ptr(m_inverse_projection); }
 		const float* getInverseViewPointer() const { return glm::value_ptr(m_inverse_view); }
 		const float* getPositionPointer() const { return glm::value_ptr(m_position); }
@@ -54,16 +53,14 @@ namespace engine {
 		float m_hwAspect;
 
 		// values for ray tracing
-		glm::mat4 m_cam_matrix;
-
 		glm::vec3 m_forward;
 		glm::vec3 m_right;
 		glm::mat4 m_projection;
 		glm::mat4 m_inverse_projection;
 		glm::mat4 m_view;
 		glm::mat4 m_inverse_view;
-
 		bool m_update_mat;
+
 		glm::vec2 m_plane_dimensions;
 		glm::vec3 m_lower_left_corner;
 		bool m_update_plane;

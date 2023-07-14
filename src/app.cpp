@@ -5,7 +5,7 @@
 
 Application::Application() {
 	m_window.create({ 960, 540 }, "Ray tracing project");
-	m_window.setFramerateLimit(144);
+	//m_window.setFramerateLimit(144);
 	m_window.setActive(true);
 	
 	glbinding::initialize(glbinding::getProcAddress, false);
@@ -56,6 +56,10 @@ Application::~Application() {
 
 void Application::run() {
 	while (m_window.isOpen()) {
+		m_currentTime = m_clock.getElapsedTime();
+		m_fps = 1.0f / (m_currentTime.asSeconds() - m_previousTime.asSeconds()); // the asSeconds returns a float
+		m_previousTime = m_currentTime;
+
 		for (auto event = sf::Event{}; m_window.pollEvent(event);) {
 			this->processEvent(event);
 		}
@@ -77,8 +81,10 @@ void Application::render() {
 	m_renderer->render(m_scene);
 
 	const engine::Camera& camera = m_scene->getCamera();
-	m_debug_text.setString("Position: " + std::to_string(camera.getPosition().x) + ", " + std::to_string(camera.getPosition().y) + ", " + std::to_string(camera.getPosition().z) 
-		+ "\nRotation: " + std::to_string(camera.getRotation().x) + ", " + std::to_string(camera.getRotation().y) + ", " + std::to_string(camera.getRotation().z));
+	m_debug_text.setString(
+		  "Position: " + std::to_string(camera.getPosition().x) + ", " + std::to_string(camera.getPosition().y) + ", " + std::to_string(camera.getPosition().z) 
+		+ "\nRotation: " + std::to_string(camera.getRotation().x) + ", " + std::to_string(camera.getRotation().y) + ", " + std::to_string(camera.getRotation().z)
+		+ "\nFPS: " + std::to_string(m_fps));
 
 	m_window.pushGLStates();
 	m_window.draw(m_debug_text);

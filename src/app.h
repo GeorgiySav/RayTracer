@@ -19,8 +19,14 @@ private:
 	std::unique_ptr<engine::Renderer> m_renderer;
 	std::unique_ptr<engine::Scene> m_scene;
 
+	// debugging
 	sf::Font m_debug_font;
 	sf::Text m_debug_text;
+
+	float m_fps;
+	sf::Clock m_clock = sf::Clock::Clock();
+	sf::Time m_previousTime = m_clock.getElapsedTime();
+	sf::Time m_currentTime;
 
 	void update();
 	void render();

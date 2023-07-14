@@ -85,11 +85,6 @@ namespace engine {
 	}
 
 	void Camera::updateMat() {
-		m_cam_matrix = glm::mat4(1.0f);
-		m_cam_matrix = glm::rotate(m_cam_matrix, m_rotation.x, { 1.0f, 0.0f, 0.0f });
-		m_cam_matrix = glm::rotate(m_cam_matrix, m_rotation.y, { 0.0f, 1.0f, 0.0f });
-		m_cam_matrix = glm::rotate(m_cam_matrix, m_rotation.z + glm::pi<float>(), {0.0f, 0.0f, 1.0f});
-
 		m_projection = glm::perspectiveFov(glm::radians(m_fov), (float)m_plane_dimensions.x, (float)m_plane_dimensions.y, m_near, m_far);
 		m_inverse_projection = glm::inverse(m_projection);
 
