@@ -5,7 +5,9 @@
 namespace engine {
 	
 	struct Material {
-		glm::vec4 colour;
+		glm::vec3 albedo;
+		float roughness = 1.0;
+		//float metallic = 0.0f;
 	};
 
 	struct Sphere {

@@ -4,27 +4,30 @@ namespace engine {
 	Scene::Scene() : m_camera() {
 		// initialise circle SSBO
 		m_circle_ssbo.max_size = 10;
+		m_circle_ssbo.size = 0;
 		gl::glGenBuffers(1, &m_circle_ssbo.id);
 		gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, m_circle_ssbo.id);
 		gl::glBufferData(gl::GL_SHADER_STORAGE_BUFFER, sizeof(Sphere) * m_circle_ssbo.max_size, NULL, gl::GL_DYNAMIC_READ);
 		gl::glBindBufferBase(gl::GL_SHADER_STORAGE_BUFFER, 1, m_circle_ssbo.id);
 		gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, 0); // unbind
-		m_circle_ssbo.size = 0;
 		Sphere test = {};
 		test.pos = { 0.0, 0.0, 1.0 };
 		test.radius = 0.5;
-		test.material.colour = { 0.0, 0.0, 1.0, 1.0 };
+		test.material.albedo = { 0.0, 0.0, 1.0 };
+		test.material.roughness = 1.0;
+		//test.material.metallic = 0.0;
 		m_circle_ssbo.add(test);
 		Sphere test2 = {};
 		test2.pos = { 1.0, 0.0, 0.0 };
 		test2.radius = 0.5;
-		test2.material.colour = { 1.0, 0.0, 0.0, 1.0 };
+		test2.material.albedo = { 1.0, 0.0, 0.0 };
+		test2.material.roughness = 1.0;
 		m_circle_ssbo.add(test2);
 		Sphere test3 = {};
 		test3.pos = { 0.0, 1.0, 0.0 };
 		test3.radius = 0.5;
-		test3.material.colour = { 0.0, 1.0, 0.0, 1.0 };
-		m_circle_ssbo.add(test3);
+		test3.material.albedo = { 0.0, 1.0, 0.0 };
+		//m_circle_ssbo.add(test3);
 	}
 
 	Scene::~Scene() {

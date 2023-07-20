@@ -1,5 +1,7 @@
 #version 460 core
 
+#define NUM_BOUNCES 2
+
 // inputs
 layout(rgba32f, binding = 0) uniform image2D screen;
 
@@ -12,12 +14,14 @@ uniform mat4 inverse_view;
 uniform mat4 inverse_projection;
 
 struct Material {
-	vec4 colour;
+	vec3 albedo;
+	float roughness;
+//	float metallic;
 };
 
 struct Sphere {
 	vec3 pos;
-	float rad;
+	float radius;
 
 	Material material;
 };
@@ -38,7 +42,11 @@ struct HitRecord {
 	vec3 normal;
 	float dist;
 	bool front_face;
+
+	int object_type;
+	int object_index;
 };
+#define OBJECT_SPHERE 0
 
 #define set_face_normal(h, r) if (dot(r.dir, h.normal) > 0.0) { \
 								h.normal = -h.normal; \
@@ -54,7 +62,8 @@ Ray createRay(vec3 origin, vec3 dir) {
 	return new_ray;
 }
 
-vec4 intersectWorld(Ray ray);
+vec4 perPixel(Ray ray);
+HitRecord intersectWorld(Ray ray);
 HitRecord intersectSphere(int sIndex, Ray r);
 
 
@@ -78,15 +87,53 @@ void main() {
 
 	Ray ray = createRay(cam_pos, normalize(ray_dir));
 
-	vec4 result = intersectWorld(ray);
+	vec4 result = perPixel(ray);
 
 	imageStore(screen, p, result);
 }
 
-vec4 intersectWorld(Ray ray) {
-	vec4 colour = vec4(0.0, 0.0, 0.0, 1.0);
+vec4 perPixel(Ray ray) {
+	vec3 result = vec3(0.0, 0.0, 0.0);
 
+	float multiplier = 1.0;
+
+	vec3 light_dir = normalize(vec3(0, -1, 0));
+
+	for (int b = 0; b < NUM_BOUNCES; b++) {
+		
+		HitRecord hit_record = intersectWorld(ray);
+
+		// the ray didn't hit anything
+		if (hit_record.hit == false) {
+			vec3 sky_color = vec3(0.6, 0.7, 0.9);
+			result += sky_color * multiplier;
+			break;
+		}
+		// ray hit an object
+		// get the material
+		Material mat;
+		switch (hit_record.object_type) {
+		case OBJECT_SPHERE:
+			mat = spheres[hit_record.object_index].material;
+			break;
+		}
+
+		float light_intensity = max(dot(hit_record.normal, -light_dir), 0.0); // == cos(angle)
+
+		result += mat.albedo * light_intensity * multiplier;
+
+		multiplier *= 0.5;
+
+		ray.origin = hit_record.point;// + hit_record.normal * 0.0001;
+		ray.dir = reflect(ray.dir, hit_record.normal);
+	}
+
+	return vec4(result, 1.0);
+}
+
+HitRecord intersectWorld(Ray ray) {	
 	HitRecord closestRecord;
+	closestRecord.hit = false;
 	closestRecord.dist = far_plane + 1.0;
 	HitRecord currentRecord;
 
@@ -96,15 +143,11 @@ vec4 intersectWorld(Ray ray) {
 		if (currentRecord.hit) {
 			if (currentRecord.dist < closestRecord.dist) {
 				closestRecord = currentRecord;	
-				colour = spheres[i].material.colour;
 			}
 		}
 	}
 
-	vec3 light_dir = normalize(vec3(-1, -1, -1));
-	colour = vec4(colour.xyz * max(dot(closestRecord.normal, -light_dir), 0.0), 1.0);
-
-	return colour;
+	return closestRecord;
 }
 
 HitRecord intersectSphere(int sIndex, Ray r) {
@@ -113,7 +156,7 @@ HitRecord intersectSphere(int sIndex, Ray r) {
 	vec3 o = r.origin - s.pos;
 	float a = dot(r.dir, r.dir);
 	float half_b = dot(o, r.dir);
-	float c = dot(o, o) - (s.rad * s.rad);
+	float c = dot(o, o) - (s.radius * s.radius);
 	float discriminant = (half_b * half_b) - (a * c);
 
 	HitRecord hit;
@@ -133,7 +176,9 @@ HitRecord intersectSphere(int sIndex, Ray r) {
 	hit.hit = true;
 	hit.dist = root;
 	hit.point = r.origin + (root * r.dir);
-	hit.normal = (hit.point - s.pos) / s.rad;
+	hit.normal = (hit.point - s.pos) / s.radius;
 	set_face_normal(hit, r);
+	hit.object_type = OBJECT_SPHERE;
+	hit.object_index = sIndex;
 	return hit;
 }
