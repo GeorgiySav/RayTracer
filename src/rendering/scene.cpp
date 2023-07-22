@@ -24,10 +24,10 @@ namespace engine {
 		test2.material.roughness = 1.0;
 		m_circle_ssbo.add(test2);
 		Sphere test3 = {};
-		test3.pos = { 0.0, 1.0, 0.0 };
-		test3.radius = 0.5;
+		test3.pos = { 0.0, -50.0, 0.0 };
+		test3.radius = 49.0;
 		test3.material.albedo = { 0.0, 1.0, 0.0 };
-		//m_circle_ssbo.add(test3);
+		m_circle_ssbo.add(test3);
 	}
 
 	Scene::~Scene() {

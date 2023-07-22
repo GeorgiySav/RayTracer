@@ -2,6 +2,37 @@
 
 #define NUM_BOUNCES 2
 
+// utility
+// random
+// PCG (permuted congruential generator). Thanks to:
+// www.pcg-random.org and www.shadertoy.com/view/XlGcRh
+uint nextRandom(inout uint state) {
+	state = state * 747796405 + 2891336453;
+	uint word = ((state >> ((state >> 28) + 4)) ^ state) * 277803737;
+	return (word >> 22) ^ word;
+}
+
+float randomValue(inout uint state) {
+	return nextRandom(state) / 4294967295.0; // 2^32 - 1
+}
+
+// Random value in normal distribution (with mean=0 and sd=1)
+float randomValueNormalDistribution(inout uint state){
+	// Thanks to https://stackoverflow.com/a/6178290
+	float theta = 2 * 3.1415926 * randomValue(state);
+	float rho = sqrt(-2 * log(randomValue(state)));
+	return rho * cos(theta);
+}
+
+// Calculate a random direction
+vec3 randomDirection(inout uint state) {
+	// Thanks to https://math.stackexchange.com/a/1585996
+	float x = randomValueNormalDistribution(state);
+	float y = randomValueNormalDistribution(state);
+	float z = randomValueNormalDistribution(state);
+	return normalize(vec3(x, y, z));
+}
+
 // inputs
 layout(rgba32f, binding = 0) uniform image2D screen;
 
@@ -62,10 +93,9 @@ Ray createRay(vec3 origin, vec3 dir) {
 	return new_ray;
 }
 
-vec4 perPixel(Ray ray);
+vec4 trace(Ray ray, uint rng_state);
 HitRecord intersectWorld(Ray ray);
 HitRecord intersectSphere(int sIndex, Ray r);
-
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 void main() {
@@ -76,7 +106,6 @@ void main() {
 		return;
 	}
 
-	vec4 pixel = vec4(0.075, 0.133, 0.173, 1.0);
 	
 	vec2 uv = vec2(0, 0);
     uv.x = float((-float(p.x * 2.0) / output_dims.x) + 1.0); // transform to [-1.0, 1.0]
@@ -87,26 +116,35 @@ void main() {
 
 	Ray ray = createRay(cam_pos, normalize(ray_dir));
 
-	vec4 result = perPixel(ray);
+	uint rng_state = p.x + p.y * output_dims.x;
+
+	vec4 result = trace(ray, rng_state);
+	result += trace(ray, rng_state + 1);
+	result += trace(ray, rng_state + 2);
+	result *= 0.25;
 
 	imageStore(screen, p, result);
 }
 
-vec4 perPixel(Ray ray) {
+vec4 trace(Ray ray, uint rng_state) {
 	vec3 result = vec3(0.0, 0.0, 0.0);
 
 	float multiplier = 1.0;
 
 	vec3 light_dir = normalize(vec3(0, -1, 0));
-
+	
 	for (int b = 0; b < NUM_BOUNCES; b++) {
 		
 		HitRecord hit_record = intersectWorld(ray);
 
 		// the ray didn't hit anything
 		if (hit_record.hit == false) {
-			vec3 sky_color = vec3(0.6, 0.7, 0.9);
-			result += sky_color * multiplier;
+			vec3 unit_dir =  normalize(ray.dir);
+			float t = 0.5 * (unit_dir.y + 1.0);
+			result += multiplier * (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
+
+			//vec3 sky_color = vec3(0.6, 0.7, 0.9);
+			//result += sky_color * multiplier;
 			break;
 		}
 		// ray hit an object
@@ -118,14 +156,14 @@ vec4 perPixel(Ray ray) {
 			break;
 		}
 
-		float light_intensity = max(dot(hit_record.normal, -light_dir), 0.0); // == cos(angle)
+		//float light_intensity = max(dot(hit_record.normal, -light_dir), 0.0); // == cos(angle)
 
-		result += mat.albedo * light_intensity * multiplier;
+		result += mat.albedo * multiplier;
 
 		multiplier *= 0.5;
 
 		ray.origin = hit_record.point;// + hit_record.normal * 0.0001;
-		ray.dir = reflect(ray.dir, hit_record.normal);
+		ray.dir = hit_record.normal + randomDirection(rng_state);
 	}
 
 	return vec4(result, 1.0);
