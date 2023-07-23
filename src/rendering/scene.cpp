@@ -20,7 +20,7 @@ namespace engine {
 		Sphere test2 = {};
 		test2.pos = { 1.0, 0.5, 0.0 };
 		test2.radius = 0.5;
-		test2.material.albedo = { 1.0, 0.0, 0.0 };
+		test2.material.albedo = { 1.0, 1.0, 1.0 };
 		test2.material.smoothness = 0.0;
 		m_circle_ssbo.add(test2);
 		Sphere test3 = {};
@@ -30,12 +30,12 @@ namespace engine {
 		test3.material.smoothness = 0.5;
 		m_circle_ssbo.add(test3);
 		Sphere test4 = {};
-		test4.pos = { 0.0, 2.0, 0.0 };
+		test4.pos = { 0.0, 1.0, 0.0 };
 		test4.radius = 0.25;
-		test4.material.albedo = { 1.0, 1.0, 1.0 };
-		test4.material.smoothness = 1.0;
-		test4.material.emissive_colour = glm::vec3(1.0);
-		test4.material.emissive_strength = 1090.0;
+		test4.material.albedo = { 0.5, 0.1, 0.2 };
+		test4.material.smoothness = 0.0;
+		test4.material.emissive_colour = { 0.5, 0.1, 0.2 };
+		test4.material.emissive_strength = 100.0;
 		m_circle_ssbo.add(test4);
 	}
 
