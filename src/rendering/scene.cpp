@@ -11,23 +11,32 @@ namespace engine {
 		gl::glBindBufferBase(gl::GL_SHADER_STORAGE_BUFFER, 1, m_circle_ssbo.id);
 		gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, 0); // unbind
 		Sphere test = {};
-		test.pos = { 0.0, 0.0, 1.0 };
+		test.pos = { 0.0, 0.5, 1.0 };
 		test.radius = 0.5;
-		test.material.albedo = { 0.0, 0.0, 1.0 };
-		test.material.roughness = 1.0;
+		test.material.albedo = { 1.0, 1.0, 1.0 };
+		test.material.smoothness = 1.0;
 		//test.material.metallic = 0.0;
 		m_circle_ssbo.add(test);
 		Sphere test2 = {};
-		test2.pos = { 1.0, 0.0, 0.0 };
+		test2.pos = { 1.0, 0.5, 0.0 };
 		test2.radius = 0.5;
 		test2.material.albedo = { 1.0, 0.0, 0.0 };
-		test2.material.roughness = 1.0;
+		test2.material.smoothness = 0.0;
 		m_circle_ssbo.add(test2);
 		Sphere test3 = {};
-		test3.pos = { 0.0, -50.0, 0.0 };
-		test3.radius = 49.0;
+		test3.pos = { 0.0, -5.0, 0.0 };
+		test3.radius = 5.0;
 		test3.material.albedo = { 0.0, 1.0, 0.0 };
+		test3.material.smoothness = 0.5;
 		m_circle_ssbo.add(test3);
+		Sphere test4 = {};
+		test4.pos = { 0.0, 2.0, 0.0 };
+		test4.radius = 0.25;
+		test4.material.albedo = { 1.0, 1.0, 1.0 };
+		test4.material.smoothness = 1.0;
+		test4.material.emissive_colour = glm::vec3(1.0);
+		test4.material.emissive_strength = 1090.0;
+		m_circle_ssbo.add(test4);
 	}
 
 	Scene::~Scene() {

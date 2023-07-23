@@ -13,7 +13,7 @@ namespace engine {
 	Camera::Camera() {
 		m_position = { 0.f, 0.f, 0.f };
 		m_rotation = { 0.f, 0.f, 0.f };
-		m_near = 0.05f;
+		m_near = 0.001f;
 		m_far = 100.f;
 		m_fov = 90.f;
 
