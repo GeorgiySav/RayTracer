@@ -87,7 +87,7 @@ namespace engine {
 
 		gl::glUniform1i(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "spheres_max"), scene->getCircleBufferSize());
 
-		m_ray_tracing_program.dispatch(std::ceil(m_screen_width * 0.125), std::ceil(m_screen_height * 0.125), 1, gl::GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		m_ray_tracing_program.dispatch(std::ceil(m_screen_width * 0.0625), std::ceil(m_screen_height * 0.0625), 1, gl::GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 	}
 

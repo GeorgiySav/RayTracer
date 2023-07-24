@@ -1,7 +1,7 @@
 #version 460 core
 
 #define NUM_BOUNCES 3
-#define NUM_SAMPLES 6
+#define NUM_SAMPLES 5
 
 // utility
 #define PI 3.1415926538
@@ -144,10 +144,11 @@ Ray createRay(vec3 origin, vec3 dir) {
 }
 
 vec4 trace(Ray ray, inout uint rng_state);
+vec3 getEnvironmentLight(Ray ray);
 HitRecord intersectWorld(Ray ray);
-HitRecord intersectSphere(int sIndex, Ray r);
+HitRecord intersectSphere(int sIndex, Ray r, float current_min);
 
-layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 void main() {
 	ivec2 output_dims = imageSize(screen);
 	ivec2 p = ivec2(gl_GlobalInvocationID.xy);
@@ -155,13 +156,12 @@ void main() {
 	if (p.x > output_dims.x || p.y > output_dims.y) {
 		return;
 	}
-
 	
 	vec2 uv = vec2(0, 0);
     uv.x = float((-float(p.x * 2.0) / output_dims.x) + 1.0); // transform to [-1.0, 1.0]
     uv.y = -float((-float(p.y * 2.0) / output_dims.y) + 1.0); // transform to [-1.0, 1.0]
 
-	uint rng_state = p.x * p.y * output_dims.x * output_dims.y;
+	uint rng_state = p.x * p.y * output_dims.x * output_dims.y ;
 
 	vec4 result = vec4(0.0, 0.0, 0.0, 0.0);
 	for (int i = 0; i < NUM_SAMPLES; i++) {
@@ -171,7 +171,6 @@ void main() {
 
 		result += trace(ray, rng_state);
 	}
-	result /= NUM_SAMPLES;
 	
 	// Divide the color by the number of samples and gamma-correct for gamma=2.0.
     float scale = 1.0 / NUM_SAMPLES;
@@ -195,7 +194,7 @@ vec4 trace(Ray ray, inout uint rng_state) {
 			vec3 unit_dir = normalize(ray.dir);
 			float t = 0.5 * (unit_dir.y + 1.0);
 			//result *= (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
-			incoming_light += result * ((1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0));
+			incoming_light += result * getEnvironmentLight(ray);
 			//vec3 sky_color = vec3(0.6, 0.7, 0.9);
 			//result += sky_color * multiplier;
 			break;
@@ -221,10 +220,23 @@ vec4 trace(Ray ray, inout uint rng_state) {
 		vec3 diffuse_dir = normalize(hit_record.normal + randomDirection(rng_state));
 		vec3 specular_dir = reflect(ray.dir, hit_record.normal);
 		ray.dir = normalize(mix(diffuse_dir, specular_dir, mat.smoothness));
-		if (nearZero(ray.dir)) ray.dir = hit_record.normal;	
+		// Random early exit if ray colour is nearly 0 (can't contribute much to final result)
+		float p = max(result.r, max(result.g, result.b));
+		if (randomValue(rng_state) >= p) {
+			break;
+		}
+		result *= 1.0 / p; 
 	}
 
 	return vec4(incoming_light, 1.0);
+}
+
+vec3 getEnvironmentLight(Ray ray) {
+	float y_scale = normalize(ray.dir).y; // -1 to 1
+	y_scale = (y_scale + 1) * 0.5; // 0 to 1
+	vec3 top_sky_colour = vec3(0.53, 0.81, 0.92);
+	vec3 bottom_sky_colour = vec3(1.0, 1.0, 1.0);
+	return mix(bottom_sky_colour, top_sky_colour, y_scale);
 }
 
 HitRecord intersectWorld(Ray ray) {	
@@ -235,7 +247,7 @@ HitRecord intersectWorld(Ray ray) {
 
 	// check for intersections with spheres
 	for (int i = 0; i < spheres_max; i++) {
-		currentRecord = intersectSphere(i, ray);
+		currentRecord = intersectSphere(i, ray, closestRecord.dist);
 		if (currentRecord.hit) {
 			if (currentRecord.dist < closestRecord.dist) {
 				closestRecord = currentRecord;	
@@ -246,7 +258,7 @@ HitRecord intersectWorld(Ray ray) {
 	return closestRecord;
 }
 
-HitRecord intersectSphere(int sIndex, Ray r) {
+HitRecord intersectSphere(int sIndex, Ray r, float current_min) {
 	Sphere s = spheres[sIndex];
 
 	vec3 o = r.origin - s.pos;
@@ -262,6 +274,10 @@ HitRecord intersectSphere(int sIndex, Ray r) {
 	}
 	float sqrtd = sqrt(discriminant);
 	float root = (-half_b - sqrtd) / a;
+	if (root >= current_min) { // don't continue processing if this sphere isn't closer than the current closest
+		hit.hit = false;
+		return hit;
+	}
 	if (root < near_plane || root > far_plane) {
 		root = (-half_b + sqrtd) / a;
 		if (root < near_plane || root > far_plane) {

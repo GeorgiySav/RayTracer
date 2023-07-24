@@ -35,7 +35,7 @@ namespace engine {
 		test4.material.albedo = { 0.5, 0.1, 0.2 };
 		test4.material.smoothness = 0.0;
 		test4.material.emissive_colour = { 0.5, 0.1, 0.2 };
-		test4.material.emissive_strength = 100.0;
+		test4.material.emissive_strength = 10.0;
 		m_circle_ssbo.add(test4);
 	}
 
