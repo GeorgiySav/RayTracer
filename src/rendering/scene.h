@@ -27,8 +27,8 @@ namespace engine {
 		void moveCamera(const glm::vec3& offset) { m_camera.move(offset); }
 		const Camera& getCamera() const { return m_camera; }
 
-		const gl::GLsizei getCircleBufferSize() { return m_circle_ssbo.size; }
-
+		const gl::GLsizei getCircleBufferSize() const { return m_circle_ssbo.size; }
+		const gl::GLsizei getPlaneBufferSize() const { return m_plane_ssbo.size; }
 	private:
 		Camera m_camera;
 
@@ -36,6 +36,16 @@ namespace engine {
 			gl::GLuint id;
 			gl::GLsizei size;
 			gl::GLsizei max_size;
+			template <typename T>
+			void create(gl::GLsizei max_size, gl::GLuint binding) {
+				this->max_size = max_size;
+				this->size = 0;
+				gl::glGenBuffers(1, &this->id);
+				gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, this->id);
+				gl::glBufferData(gl::GL_SHADER_STORAGE_BUFFER, sizeof(T) * this->max_size, NULL, gl::GL_DYNAMIC_READ);
+				gl::glBindBufferBase(gl::GL_SHADER_STORAGE_BUFFER, binding, this->id);
+				gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, 0); // unbind	
+			}
 			~SSBO() { gl::glDeleteBuffers(1, &id); }
 			template <typename T>
 			void add(T& data) {
@@ -52,5 +62,6 @@ namespace engine {
 			}
 		};
 		SSBO m_circle_ssbo;
+		SSBO m_plane_ssbo;
 	};
 }

@@ -17,4 +17,13 @@ namespace engine {
 
 		Material material;
 	};
+
+	struct Plane {
+		glm::vec3 pos;
+		float padding0;
+		glm::vec3 normal;
+		float padding1;
+
+		Material material;
+	};
 }
