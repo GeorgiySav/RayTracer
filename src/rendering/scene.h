@@ -27,8 +27,9 @@ namespace engine {
 		void moveCamera(const glm::vec3& offset) { m_camera.move(offset); }
 		const Camera& getCamera() const { return m_camera; }
 
-		const gl::GLsizei getCircleBufferSize() const { return m_circle_ssbo.size; }
+		const gl::GLsizei getSphereBufferSize() const { return m_sphere_ssbo.size; }
 		const gl::GLsizei getPlaneBufferSize() const { return m_plane_ssbo.size; }
+		const gl::GLsizei getBoxBufferSize() const { return m_box_ssbo.size; }
 	private:
 		Camera m_camera;
 
@@ -52,16 +53,13 @@ namespace engine {
 				if (size >= max_size)
 					return;
 				gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, id);
-				//void* raw_data = gl::glMapBufferRange(gl::GL_SHADER_STORAGE_BUFFER, size, (size + 1) * item_size, gl::GL_MAP_WRITE_BIT | gl::GL_MAP_INVALIDATE_BUFFER_BIT);
-				//T* ssbo_data = static_cast<T*>(raw_data);
-				//ssbo_data[size] = data;
-				//gl::glUnmapBuffer(gl::GL_SHADER_STORAGE_BUFFER);
 				gl::glBufferSubData(gl::GL_SHADER_STORAGE_BUFFER, size * sizeof(T), sizeof(T), &data);
 				gl::glBindBuffer(gl::GL_SHADER_STORAGE_BUFFER, 0);
 				size++;
 			}
 		};
-		SSBO m_circle_ssbo;
+		SSBO m_sphere_ssbo;
 		SSBO m_plane_ssbo;
+		SSBO m_box_ssbo;
 	};
 }

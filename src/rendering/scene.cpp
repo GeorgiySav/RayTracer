@@ -3,19 +3,19 @@
 namespace engine {
 	Scene::Scene() : m_camera() {
 		// initialise Sphere SSBO
-		m_circle_ssbo.create<Sphere>(10, 1);
+		m_sphere_ssbo.create<Sphere>(10, 1);
 		Sphere test = {};
 		test.pos = { 0.0, 0.5, 0.0 };
 		test.radius = 0.5;
 		test.material.albedo = { 1.0, 1.0, 1.0 };
 		test.material.smoothness = 1.0;
-		m_circle_ssbo.add(test);
+		m_sphere_ssbo.add(test);
 		Sphere test2 = {};
 		test2.pos = { 1.0, 0.5, 1.0 };
 		test2.radius = 0.5;
 		test2.material.albedo = { 1.0, 1.0, 1.0 };
 		test2.material.smoothness = 0.0;
-		m_circle_ssbo.add(test2);
+		m_sphere_ssbo.add(test2);
 		Sphere test3 = {};
 		test3.pos = { 0.0, -100.0, 0.0 };
 		test3.radius = 100;
@@ -29,10 +29,10 @@ namespace engine {
 		test4.material.smoothness = 0.0;
 		test4.material.emissive_colour = { 0.5, 0.1, 0.2 };
 		test4.material.emissive_strength = 10.0;
-		m_circle_ssbo.add(test4);
+		m_sphere_ssbo.add(test4);
 		
 		// initialise Plane SSBO
-		m_plane_ssbo.create<Plane>(1, 2);
+		m_plane_ssbo.create<Plane>(10, 2);
 		{
 			Plane plane = {};
 			plane.pos = { 0.0, 0.0, 0.0 };
@@ -40,6 +40,24 @@ namespace engine {
 			plane.material.albedo = { 0.9, 0.9, 0.9 };
 			plane.material.smoothness = 0.0;
 			m_plane_ssbo.add(plane);
+		}
+		{
+			Plane plane = {};
+			plane.pos = { 0.0, 0.0, -10.0 };
+			plane.normal = { 0.0, 0.0, 1.0 };
+			plane.material.albedo = { 0.5, 0.5, 0.5 };
+			plane.material.smoothness = 0.0;
+			m_plane_ssbo.add(plane);
+		}
+		
+		// intialise Box SSBO
+		m_box_ssbo.create<Box>(10, 3);
+		{
+			Box box = {};
+			box.min_corner = { 1.0, 0.5, 0.0 };
+			box.max_corner = { 2.0, 1.5, 1.0 };
+			box.material.albedo = { 0.1, 0.5, 0.3 };
+			m_box_ssbo.add(box);
 		}
 	}
 

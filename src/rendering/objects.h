@@ -26,4 +26,13 @@ namespace engine {
 
 		Material material;
 	};
+
+	struct Box {
+		glm::vec3 min_corner;
+		float padding0;
+		glm::vec3 max_corner;
+		float padding1;
+
+		Material material;
+	};
 }

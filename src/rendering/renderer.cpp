@@ -85,8 +85,9 @@ namespace engine {
 		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "inverse_view"), 1, gl::GL_FALSE, scene_camera.getInverseViewPointer());
 		gl::glUniformMatrix4fv(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "inverse_projection"), 1, gl::GL_FALSE, scene_camera.getInverseProjectionPointer());
 
-		gl::glUniform1i(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "spheres_max"), scene->getCircleBufferSize());
+		gl::glUniform1i(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "spheres_max"), scene->getSphereBufferSize());
 		gl::glUniform1i(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "planes_max"), scene->getPlaneBufferSize());
+		gl::glUniform1i(gl::glGetUniformLocation(m_ray_tracing_program.getId(), "boxes_max"), scene->getBoxBufferSize());
 
 		m_ray_tracing_program.dispatch(std::ceil(m_screen_width * 0.0625), std::ceil(m_screen_height * 0.0625), 1, gl::GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
