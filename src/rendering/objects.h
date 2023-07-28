@@ -9,6 +9,8 @@ namespace engine {
 		float smoothness = 0.0;
 		glm::vec3 emissive_colour = glm::vec3(1.0);
 		float emissive_strength = 0.0;
+		glm::vec3 padding0;
+		float refractive_index = 0.0;
 	};
 
 	struct Sphere {
