@@ -16,7 +16,7 @@ namespace engine {
 		test2.material.albedo = { 1.0, 1.0, 1.0 };
 		test2.material.smoothness = 1.0;
 		test2.material.refractive_index = 1.5;
-		m_sphere_ssbo.add(test2);
+		//m_sphere_ssbo.add(test2);
 		Sphere test4 = {};
 		test4.pos = { 2.0, 0.5, 0.0 };
 		test4.radius = 0.5;
@@ -49,10 +49,12 @@ namespace engine {
 		m_box_ssbo.create<Box>(10, 3);
 		{
 			Box box = {};
-			box.min_corner = { 1.0, 0.5, 0.0 };
-			box.max_corner = { 2.0, 1.5, 1.0 };
-			box.material.albedo = { 0.1, 0.5, 0.3 };
-			//m_box_ssbo.add(box);
+			box.min_corner = { 0.5, 0.0, 1.5 };
+			box.max_corner = { 1.5, 1.0, 0.5 };
+			box.material.albedo = glm::vec3(1.0);// { 0.1, 0.5, 0.3 };
+			box.material.smoothness = 0.9;
+			box.material.refractive_index = 1.5;
+			m_box_ssbo.add(box);
 		}
 	}
 

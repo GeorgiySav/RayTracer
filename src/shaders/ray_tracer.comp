@@ -249,10 +249,10 @@ vec4 trace(Ray ray, inout uint rng_state) {
 
 		if (mat.refractive_index > 0.0) {
 			float refraction_ratio;	
-			if (hit_record.front_face)
+			//if (hit_record.front_face)
 				refraction_ratio = 1.0 / mat.refractive_index;
-			else
-				refraction_ratio = mat.refractive_index;
+			//else
+			//	refraction_ratio = mat.refractive_index;
 
 			float cos_theta = min(dot(-ray.dir, hit_record.normal), 1.0);
             float sin_theta = sqrt(1.0 - cos_theta * cos_theta);
@@ -265,7 +265,7 @@ vec4 trace(Ray ray, inout uint rng_state) {
             else
                 refracted_dir = refract(ray.dir, hit_record.normal, refraction_ratio);
 
-			ray.dir = refracted_dir;// normalize(mix(diffuse_dir, refracted_dir, mat.smoothness));
+			ray.dir = normalize(mix(diffuse_dir, refracted_dir, mat.smoothness));
 		}
 		else {
 			vec3 specular_dir = reflect(ray.dir, hit_record.normal);
